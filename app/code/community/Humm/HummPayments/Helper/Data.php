@@ -16,7 +16,14 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract
      * @return string
      */
     public static function getCheckoutUrl() {
-        return Mage::getStoreConfig('payment/HummPayments/gateway_url');
+        $country = Mage::getStoreConfig('payment/HummPayments/specificcountry');
+        $country_domain = $country == 'NZ'? '.co.nz' : '.com.au';  // .com.au is the default value
+        $isSandbox = Mage::getStoreConfig('is_testing')=='yes'? false : true;
+        if (!$isSandbox){
+			return 'https://secure.oxipay'.$country_domain.'/Checkout?platform=Default';
+		} else {
+			return 'https://securesandbox.oxipay'.$country_domain.'/Checkout?platform=Default';
+		}
     }
 
 	/**
@@ -24,19 +31,9 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract
 	 * @return string
 	 */
 	public static function getRefundUrl() {
-		$checkoutUrl = self::getCheckoutUrl();
-		if (strpos($checkoutUrl, ".co.nz") !== false){
-			$country_domain = '.co.nz';
-		} else {
-			$country_domain = '.com.au'; // default value
-		}
-
-		if (strpos($checkoutUrl, 'sandbox') === false) {
-			$isSandbox = false;
-		} else {
-			$isSandbox = true; //default value
-		}
-
+        $country = Mage::getStoreConfig('payment/HummPayments/specificcountry');
+        $country_domain = $country == 'NZ'? '.co.nz' : '.com.au';  // .com.au is the default value
+        $isSandbox = Mage::getStoreConfig('is_testing')=='yes'? false : true;
 		if (!$isSandbox){
 			return 'https://portals.shophumm'.$country_domain.'/api/ExternalRefund/processrefund';
 		} else {

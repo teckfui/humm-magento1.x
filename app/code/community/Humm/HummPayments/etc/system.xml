@@ -46,6 +46,16 @@
                             <show_in_store>0</show_in_store>
                             <sort_order>3</sort_order>
                         </gateway_url>
+                        <is_testing translate="label">
+                            <label>Is Testing?</label>
+                            <frontend_type>select</frontend_type>
+                            <source_model>adminhtml/system_config_source_yesno</source_model>
+                            <validate>required-entry</validate>
+                            <show_in_default>1</show_in_default>
+                            <show_in_website>1</show_in_website>
+                            <show_in_store>0</show_in_store>
+                            <sort_order>3.5</sort_order>
+                        </is_testing>
                         <humm_approved_order_status translate="label">
                             <label>Status for Humm Approved Orders</label>
                             <frontend_type>select</frontend_type>
