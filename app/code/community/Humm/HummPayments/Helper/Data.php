@@ -23,10 +23,15 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract
 		    $country        = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
 		    $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
 		    $isSandbox      = Mage::getStoreConfig( 'is_testing' ) == 'yes' ? false : true;
+
+		    $launch_time_string = Mage::getStoreConfig('payment/HummPayments/launch_time');
+		    $is_after = ( time() - strtotime($launch_time_string) >= 0 );
+		    $main_domain = ($is_after && Mage::getStoreConfig('payment/HummPayments/specificcountry')=='AU' )? 'shophumm' : 'oxipay';
+
 		    if ( ! $isSandbox ) {
-			    return 'https://secure.oxipay' . $country_domain . '/Checkout?platform=Default';
+			    return 'https://secure.'.$main_domain.$country_domain . '/Checkout?platform=Default';
 		    } else {
-			    return 'https://securesandbox.oxipay' . $country_domain . '/Checkout?platform=Default';
+			    return 'https://securesandbox.'.$main_domain.$country_domain . '/Checkout?platform=Default';
 		    }
 	    }
     }
@@ -39,10 +44,15 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract
         $country = Mage::getStoreConfig('payment/HummPayments/specificcountry');
         $country_domain = $country == 'NZ'? '.co.nz' : '.com.au';  // .com.au is the default value
         $isSandbox = Mage::getStoreConfig('is_testing')=='yes'? false : true;
+
+		$launch_time_string = Mage::getStoreConfig('payment/HummPayments/launch_time');
+		$is_after = ( time() - strtotime($launch_time_string) >= 0 );
+		$main_domain = ($is_after && Mage::getStoreConfig('payment/HummPayments/specificcountry')=='AU' )? 'shophumm' : 'oxipay';
+
 		if (!$isSandbox){
-			return 'https://portals.shophumm'.$country_domain.'/api/ExternalRefund/processrefund';
+			return 'https://portals.'.$main_domain.$country_domain.'/api/ExternalRefund/processrefund';
 		} else {
-			return 'https://portalssandbox.shophumm'.$country_domain.'/api/ExternalRefund/processrefund';
+			return 'https://portalssandbox.'.$main_domain.$country_domain.'/api/ExternalRefund/processrefund';
 		}
 	}
 

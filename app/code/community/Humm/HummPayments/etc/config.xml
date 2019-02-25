@@ -48,7 +48,7 @@
         <payment>
             <HummPayments>
                 <model>HummPayments/paymentmethod</model>
-                <title>Humm</title>
+                <title></title>
                 <payment_action>sale</payment_action>
                 <active>0</active>
                 <merchant_number></merchant_number>

@@ -1,2 +1,16 @@
 <!--Humm Logo-->
-<img src="<?php echo Mage::getDesign()->getSkinUrl("images/Humm/humm-logo.png") ?>" style="width:auto;height:24px;margin-right:10px;" />
+<div>
+	<?php
+	$launch_time_string = Mage::getStoreConfig('payment/HummPayments/launch_time');
+	$is_after = ( time() - strtotime($launch_time_string) >= 0 );
+	if($is_after && Mage::getStoreConfig('payment/HummPayments/specificcountry')=='AU' ){
+		?>
+        <img src="<?php echo Mage::getDesign()->getSkinUrl("images/Humm/humm-logo.png") ?>" style="width:auto;height:24px;margin-right:10px;" />Humm
+		<?php
+	} else {
+		?>
+        <img src="<?php echo Mage::getDesign()->getSkinUrl("images/Humm/oxipay-logo.png") ?>" style="width:auto;height:24px;margin-right:10px;" />Oxipay
+		<?php
+	}
+	?>
+</div>
