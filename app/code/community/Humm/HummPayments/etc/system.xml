@@ -38,9 +38,8 @@
                             <sort_order>2</sort_order>
                         </api_key>
                         <gateway_url translate="label">
-                            <label>Humm Gateway URL</label>
+                            <label>Humm Gateway URL (Leave empty if not sure)</label>
                             <frontend_type>text</frontend_type>
-                            <validate>required-entry</validate>
                             <show_in_default>1</show_in_default>
                             <show_in_website>1</show_in_website>
                             <show_in_store>0</show_in_store>

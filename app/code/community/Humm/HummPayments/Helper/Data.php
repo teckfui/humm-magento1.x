@@ -16,14 +16,19 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract
      * @return string
      */
     public static function getCheckoutUrl() {
-        $country = Mage::getStoreConfig('payment/HummPayments/specificcountry');
-        $country_domain = $country == 'NZ'? '.co.nz' : '.com.au';  // .com.au is the default value
-        $isSandbox = Mage::getStoreConfig('is_testing')=='yes'? false : true;
-        if (!$isSandbox){
-			return 'https://secure.oxipay'.$country_domain.'/Checkout?platform=Default';
-		} else {
-			return 'https://securesandbox.oxipay'.$country_domain.'/Checkout?platform=Default';
-		}
+    	$checkoutUrl = Mage::getStoreConfig('payment/HummPayments/gateway_url');
+    	if(isset($checkoutUrl) and strtolower(substr($checkoutUrl, 0, 4))=='http') {
+			return $checkoutUrl;
+	    } else {
+		    $country        = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
+		    $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
+		    $isSandbox      = Mage::getStoreConfig( 'is_testing' ) == 'yes' ? false : true;
+		    if ( ! $isSandbox ) {
+			    return 'https://secure.oxipay' . $country_domain . '/Checkout?platform=Default';
+		    } else {
+			    return 'https://securesandbox.oxipay' . $country_domain . '/Checkout?platform=Default';
+		    }
+	    }
     }
 
 	/**
