@@ -47,18 +47,18 @@
     <default>
         <payment>
             <HummPayments>
-                <active>0</active>
                 <model>HummPayments/paymentmethod</model>
-                <humm_approved_order_status>humm_processed</humm_approved_order_status>
                 <title>Humm</title>
-                <allowspecific>0</allowspecific>
                 <payment_action>sale</payment_action>
-                <gateway_url></gateway_url>
-                <specificcountry>AU,NZ</specificcountry>
+                <active>0</active>
                 <merchant_number></merchant_number>
                 <api_key></api_key>
+                <gateway_url></gateway_url>
+                <is_testing>1</is_testing>
+                <humm_approved_order_status>humm_processed</humm_approved_order_status>
                 <automatic_invoice>0</automatic_invoice> <!-- 0:No -->
                 <email_customer>1</email_customer>
+                <specificcountry>AU</specificcountry>
             </HummPayments>
         </payment>
         <humm>
