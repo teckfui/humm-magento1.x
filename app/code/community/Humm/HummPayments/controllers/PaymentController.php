@@ -333,25 +333,10 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         $total = $order->getTotalDue();
 
         if ($this->getSpecificCountry() == self::OXIPAY_AU_COUNTRY_CODE) {
-            if ($total > 2100) {
-                Mage::getSingleton('checkout/session')->addError("Humm doesn't support purchases over $2100.");
-                return false;
-            }
-
             $specificCurrency = self::OXIPAY_AU_CURRENCY_CODE;
         }
         else if ($this->getSpecificCountry() == self::OXIPAY_NZ_COUNTRY_CODE) {
-            if ($total > 1500) {
-                Mage::getSingleton('checkout/session')->addError("Humm doesn't support purchases over $1500.");
-                return false;
-            }
-
             $specificCurrency = self::OXIPAY_NZ_CURRENCY_CODE;
-        }
-
-        if($total < 20) {
-            Mage::getSingleton('checkout/session')->addError("Humm doesn't support purchases less than $20.");
-            return false;
         }
 
         if($order->getBillingAddress()->getCountry() != $this->getSpecificCountry() || $order->getOrderCurrencyCode() != $specificCurrency ) {
