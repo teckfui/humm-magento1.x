@@ -47,4 +47,32 @@ class Humm_HummPayments_Model_Observer
             $orderModel->save();
         }
     }
+
+    public function carryOverSettings( $observer ) {
+        if ( ! Mage::getStoreConfig( 'payment/HummPayments/merchant_number' ) ) {
+            $is_carried_over = Mage::getStoreConfig( 'payment/HummPayments/settings_carried_over' );
+            if ( Mage::getStoreConfig( 'payment/OxiPayments/merchant_number' ) && empty( $is_carried_over ) ) {
+                $carry_over_list = [
+                    'active',
+                    'merchant_number',
+                    'api_key',
+                    'gateway_url',
+                    'is_testing',
+                    'humm_approved_order_status',
+                    'automatic_invoice',
+                    'email_customer',
+                    'min_order_total',
+                    'max_order_total',
+                    'specificcountry',
+                    'sort_order',
+                ];
+                foreach ( $carry_over_list as $target ) {
+                    $source = ( $target == 'humm_approved_order_status' ) ? 'oxipay_approved_order_status' : $target;
+                    Mage::getConfig()->saveConfig( 'payment/HummPayments/' . $target, Mage::getStoreConfig( 'payment/OxiPayments/' . $source ) );
+                }
+            }
+
+            Mage::getConfig()->saveConfig( 'payment/HummPayments/settings_carried_over', 1 );
+        }
+    }
 }
