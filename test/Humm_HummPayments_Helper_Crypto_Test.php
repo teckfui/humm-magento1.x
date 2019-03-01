@@ -1,34 +1,33 @@
 <?php
+
 use PHPUnit\Framework\TestCase;
-require dirname(__FILE__).'\..\app\code\community\Humm\HummPayments\Helper\Crypto.php';
 
-class_alias('Humm_HummPayments_Helper_Crypto', 'systemUnderTest');
+require dirname( __FILE__ ) . '\..\app\code\community\Humm\HummPayments\Helper\Crypto.php';
 
-class Humm_HummPayments_Helper_Crypto_Test extends TestCase
-{
+class_alias( 'Humm_HummPayments_Helper_Crypto', 'systemUnderTest' );
+
+class Humm_HummPayments_Helper_Crypto_Test extends TestCase {
     private $apiKey = 'May the phorce be with you.';
     private $expectedSignature = 'u3CfH0b/3qybMHK9h52zUdtvhRXKCEQaribfoVPYaAA=';
 
-    public function test_generateSignature_correctlyGeneratesSignature()
-    {
-        $query = array(
+    public function test_generateSignature_correctlyGeneratesSignature() {
+        $query  = array(
             'this' => 'that',
             'then' => 'now'
         );
-        $actual = systemUnderTest::generateSignature($query, $this->apiKey);
+        $actual = systemUnderTest::generateSignature( $query, $this->apiKey );
 
-        $this->assertEquals($this->expectedSignature, $actual);
+        $this->assertEquals( $this->expectedSignature, $actual );
     }
 
-    public function test_isValidSignature_correctlyChecksSignature()
-    {
+    public function test_isValidSignature_correctlyChecksSignature() {
         $query = array(
-            'this' => 'that',
-            'then' => 'now',
+            'this'        => 'that',
+            'then'        => 'now',
             'x_signature' => $this->expectedSignature
         );
 
-        $actual = systemUnderTest::isValidSignature($query, $this->apiKey);
-        $this->assertTrue($actual);
+        $actual = systemUnderTest::isValidSignature( $query, $this->apiKey );
+        $this->assertTrue( $actual );
     }
 }

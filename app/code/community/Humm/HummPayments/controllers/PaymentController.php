@@ -50,11 +50,12 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         $order   = $this->getOrderById( $orderId );
 
         if ( $order && $order->getId() ) {
-            $cancel_signature_query = [ "orderId"   => $orderId,
-                                        "amount"    => $order->getTotalDue(),
-                                        "email"     => $order->getData( 'customer_email' ),
-                                        "firstname" => $order->getCustomerFirstname(),
-                                        "lastname"  => $order->getCustomerLastname()
+            $cancel_signature_query = [
+                "orderId"   => $orderId,
+                "amount"    => $order->getTotalDue(),
+                "email"     => $order->getData( 'customer_email' ),
+                "firstname" => $order->getCustomerFirstname(),
+                "lastname"  => $order->getCustomerLastname()
             ];
             $cancel_signature       = Humm_HummPayments_Helper_Crypto::generateSignature( $cancel_signature_query, $this->getApiKey() );
             $signatureValid         = ( $this->getRequest()->get( 'signature' ) == $cancel_signature );
@@ -300,11 +301,12 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         }
 
         $orderId                = (int) $order->getRealOrderId();
-        $cancel_signature_query = [ "orderId"   => $orderId,
-                                    "amount"    => $order->getTotalDue(),
-                                    "email"     => $order->getData( 'customer_email' ),
-                                    "firstname" => $order->getCustomerFirstname(),
-                                    "lastname"  => $order->getCustomerLastname()
+        $cancel_signature_query = [
+            "orderId"   => $orderId,
+            "amount"    => $order->getTotalDue(),
+            "email"     => $order->getData( 'customer_email' ),
+            "firstname" => $order->getCustomerFirstname(),
+            "lastname"  => $order->getCustomerLastname()
         ];
         $cancel_signature       = Humm_HummPayments_Helper_Crypto::generateSignature( $cancel_signature_query, $this->getApiKey() );
         $data                   = array(

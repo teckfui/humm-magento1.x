@@ -10,16 +10,16 @@ $installer = $this;
 $installer->startSetup();
 
 // add default Humm Status "Humm Processed" for STATE_PROCESSING state
-$installer->run("INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('pending_humm', 'Pending Humm');");
+$installer->run( "INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('pending_humm', 'Pending Humm');" );
 
 // update the existing status
-$installer->run("UPDATE `{$this->getTable('sales_order_status')}` set `label`= 'Humm Processed' where `status`='humm_processed'");
+$installer->run( "UPDATE `{$this->getTable('sales_order_status')}` set `label`= 'Humm Processed' where `status`='humm_processed'" );
 
 // Cancelled Humm
-$installer->run("INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('cancelled_humm', 'Cancelled Humm');");
+$installer->run( "INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('cancelled_humm', 'Cancelled Humm');" );
 
 // Declined Humm
-$installer->run("INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('declined_humm', 'Declined Humm');");
+$installer->run( "INSERT INTO `{$this->getTable('sales_order_status')}` (`status`, `label`) VALUES ('declined_humm', 'Declined Humm');" );
 
 
 $installer->endSetup();
