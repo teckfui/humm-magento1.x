@@ -19,7 +19,9 @@ class Humm_HummPayments_Helper_Crypto {
         $clear_text = '';
         ksort( $query );
         foreach ( $query as $key => $value ) {
-            $clear_text .= $key . $value;
+            if ( substr( $key, 0, 2 ) === "x_" && $key !== "x_signature" ) {
+                $clear_text .= $key . $value;
+            }
         }
         $hash = hash_hmac( "sha256", $clear_text, $api_key );
         $hash = str_replace( '-', '', $hash );
