@@ -20,7 +20,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
         } else {
             $country        = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
             $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
-            $isSandbox      = Mage::getStoreConfig( 'is_testing' ) == 'yes' ? false : true;
+            $isSandbox      = Mage::getStoreConfig( 'is_testing' ) ? true : false;
 
             $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time' );
             $is_after           = ( time() - strtotime( $launch_time_string ) >= 0 );
