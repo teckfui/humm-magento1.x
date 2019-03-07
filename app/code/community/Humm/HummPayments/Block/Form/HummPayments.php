@@ -8,7 +8,8 @@
  */
 class Humm_HummPayments_Block_Form_HummPayments extends Mage_Payment_Block_Form {
     const LAUNCH_TIME_URL = 'https://s3-ap-southeast-2.amazonaws.com/widgets.shophumm.com.au/time.txt';
-    const LAUNCH_TIME_DEFAULT = "2019-03-31 13:30:00";
+    const LAUNCH_TIME_DEFAULT = "2019-04-07 14:30:00";
+    const LAUNCH_TIME_CHECK_ENDS = "2019-10-07 13:30:00";
 
     protected function _construct() {
         $this->updateLaunchDate();
@@ -24,7 +25,7 @@ class Humm_HummPayments_Block_Form_HummPayments extends Mage_Payment_Block_Form 
         $launch_time_string             = Mage::getStoreConfig( 'payment/HummPayments/launch_time' );
         $launch_time_update_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time_updated' );
         if ( empty( $launch_time_string ) || ( time() - $launch_time_update_time_string >= 3600 ) ) {
-            $remote_launch_time_string = file_get_contents( self::LAUNCH_TIME_URL );
+            $remote_launch_time_string = ( time() - self::LAUNCH_TIME_CHECK_ENDS < 0 )? file_get_contents( self::LAUNCH_TIME_URL ) : '';
             if ( ! empty( $remote_launch_time_string ) ) {
                 $launch_time_string = $remote_launch_time_string;
                 Mage::getConfig()->saveConfig( 'payment/HummPayments/launch_time', $launch_time_string );
