@@ -66,6 +66,7 @@
                 <api_key></api_key>
                 <gateway_url></gateway_url>
                 <is_testing>1</is_testing>
+                <force_humm>0</force_humm>
                 <humm_approved_order_status>humm_processed</humm_approved_order_status>
                 <automatic_invoice>0</automatic_invoice> <!-- 0:No -->
                 <email_customer>1</email_customer>
