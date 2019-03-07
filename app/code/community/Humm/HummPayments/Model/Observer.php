@@ -50,7 +50,7 @@ class Humm_HummPayments_Model_Observer {
     public function carryOverSettings( $observer ) {
         if ( ! Mage::getStoreConfig( 'payment/HummPayments/merchant_number' ) ) {
             $is_carried_over = Mage::getStoreConfig( 'payment/HummPayments/settings_carried_over' );
-            if ( Mage::getStoreConfig( 'payment/OxiPayments/merchant_number' ) && empty( $is_carried_over ) ) {
+            if ( Mage::getStoreConfig( 'payment/oxipayments/merchant_number' ) && empty( $is_carried_over ) ) {
                 $carry_over_targets = [
                     'active',
                     'merchant_number',
@@ -66,7 +66,7 @@ class Humm_HummPayments_Model_Observer {
                 ];
                 foreach ( $carry_over_targets as $target ) {
                     $source = ( $target == 'humm_approved_order_status' ) ? 'oxipay_approved_order_status' : $target;
-                    Mage::getConfig()->saveConfig( 'payment/HummPayments/' . $target, Mage::getStoreConfig( 'payment/OxiPayments/' . $source ) );
+                    Mage::getConfig()->saveConfig( 'payment/HummPayments/' . $target, Mage::getStoreConfig( 'payment/oxipayments/' . $source ) );
                 }
                 // set approved order status to 'processing' by default because other statuses may not exist
                 Mage::getConfig()->saveConfig( 'payment/HummPayments/humm_approved_order_status', 'processing' );
