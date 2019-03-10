@@ -22,10 +22,22 @@ class Humm_HummPayments_Block_Form_HummPayments extends Mage_Payment_Block_Form 
     }
 
     private function updateLaunchDate() {
+        if ( time() - strtotime( self::LAUNCH_TIME_CHECK_ENDS ) > 0 ) {
+            // if after LAUNCH_TIME_CHECK_ENDS time, and launch_time is still empty, set it to default launch time, and done.
+            if ( ! Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' ) ) {
+                Mage::getConfig()->saveConfig( 'payment/HummPayments/launch_time_string', self::LAUNCH_TIME_DEFAULT );
+            }
+
+            return;
+        }
         $launch_time_string      = Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' );
         $launch_time_update_time = Mage::getStoreConfig( 'payment/HummPayments/launch_time_updated' );
         if ( empty( $launch_time_string ) || ( time() - $launch_time_update_time >= 3600 ) ) {
-            $remote_launch_time_string = ( time() - self::LAUNCH_TIME_CHECK_ENDS < 0 ) ? file_get_contents( self::LAUNCH_TIME_URL ) : '';
+            $remote_launch_time_string = '';
+            try {
+                $remote_launch_time_string = file_get_contents( self::LAUNCH_TIME_URL );
+            } catch ( Exception $exception ) {
+            }
             if ( ! empty( $remote_launch_time_string ) ) {
                 $launch_time_string = $remote_launch_time_string;
                 Mage::getConfig()->saveConfig( 'payment/HummPayments/launch_time_string', $launch_time_string );
