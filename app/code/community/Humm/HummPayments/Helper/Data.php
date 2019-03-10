@@ -22,7 +22,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
             $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
             $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
 
-            $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time' );
+            $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' );
             $is_after           = ( time() - strtotime( $launch_time_string ) >= 0 ) || Mage::getStoreConfig( 'payment/HummPayments/force_humm' );
             $main_domain        = ( $is_after && Mage::getStoreConfig( 'payment/HummPayments/specificcountry' ) == 'AU' ) ? 'shophumm' : 'oxipay';
 
@@ -43,7 +43,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
         $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
         $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) == 'yes' ? false : true;
 
-        $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time' );
+        $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' );
         $is_after           = ( time() - strtotime( $launch_time_string ) >= 0 ) || Mage::getStoreConfig( 'payment/HummPayments/force_humm' );
         $main_domain        = ( $is_after && Mage::getStoreConfig( 'payment/HummPayments/specificcountry' ) == 'AU' ) ? 'shophumm' : 'oxipay';
 
