@@ -31,5 +31,5 @@ notifications:
       - devadmin@shophumm.com.au
   - provider: Slack
     auth_token:
-      secure: gB+c8mw7sdpW1i0l19i0uPlU012NvtaKhxZ+2OSGDFAi9MbGOgA9+Gvgx6ETk7uw
+      secure: lgjOGAi/xfra+Ezjg696zGwfMyEivWbNo6ho9GwbeQConO2VwxX2txxjWrZVqAaxTtI7y/ODz0HG3uMfIiM5wF2Fa0KsT8I+KL7PW9BbzpQ=
     channel: '#alerts'
