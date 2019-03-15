@@ -10,27 +10,31 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
-     * get the URL of the configured humm gateway checkout
+     * get the Domain part of the configured humm gateway checkout/refund URL
      * @return string
      */
-    public static function getCheckoutUrl() {
+    public static function getCheckoutDomain() {
         $checkoutUrl = Mage::getStoreConfig( 'payment/HummPayments/gateway_url' );
         if ( isset( $checkoutUrl ) and strtolower( substr( $checkoutUrl, 0, 4 ) ) == 'http' ) {
             return $checkoutUrl;
         } else {
-            $country        = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
-            $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
-            $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
-
+            $country            = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
+            $country_domain     = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
+            $isSandbox          = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
             $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' );
             $is_after           = ( time() - strtotime( $launch_time_string ) >= 0 ) || Mage::getStoreConfig( 'payment/HummPayments/force_humm' );
-            $main_domain        = ( $is_after && Mage::getStoreConfig( 'payment/HummPayments/specificcountry' ) == 'AU' ) ? 'shophumm' : 'oxipay';
+            $title              = ( $is_after && Mage::getStoreConfig( 'payment/HummPayments/specificcountry' ) == 'AU' ) ? 'Humm' : 'Oxipay';
+            $domainsTest        = array(
+                'Humm'   => 'test3-cart.shophumm',
+                'Oxipay' => 'securesandbox.oxipay'
+            );
+            $domains            = array(
+                'Humm'   => 'cart.shophumm',
+                'Oxipay' => 'secure.oxipay'
+            );
 
-            if ( ! $isSandbox ) {
-                return 'https://secure.' . $main_domain . $country_domain . '/Checkout?platform=Default';
-            } else {
-                return 'https://securesandbox.' . $main_domain . $country_domain . '/Checkout?platform=Default';
-            }
+            return 'https://' . ( $isSandbox ? $domainsTest[ $title ] : $domains[ $title ] ) . $country_domain;
+
         }
     }
 
@@ -38,20 +42,16 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
      * get the URL of the configured humm gateway checkout
      * @return string
      */
-    public static function getRefundUrl() {
-        $country        = Mage::getStoreConfig( 'payment/HummPayments/specificcountry' );
-        $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
-        $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) == 'yes' ? false : true;
+    public static function getCheckoutURL() {
+        return self::getCheckoutDomain() . '/Checkout?platform=Default';
+    }
 
-        $launch_time_string = Mage::getStoreConfig( 'payment/HummPayments/launch_time_string' );
-        $is_after           = ( time() - strtotime( $launch_time_string ) >= 0 ) || Mage::getStoreConfig( 'payment/HummPayments/force_humm' );
-        $main_domain        = ( $is_after && Mage::getStoreConfig( 'payment/HummPayments/specificcountry' ) == 'AU' ) ? 'shophumm' : 'oxipay';
-
-        if ( ! $isSandbox ) {
-            return 'https://portals.' . $main_domain . $country_domain . '/api/ExternalRefund/processrefund';
-        } else {
-            return 'https://portalssandbox.' . $main_domain . $country_domain . '/api/ExternalRefund/processrefund';
-        }
+    /**
+     * get the URL of the configured humm gateway refund
+     * @return string
+     */
+    public static function getRefundURL() {
+        return self::getCheckoutDomain() . '/api/ExternalRefund/processrefund';
     }
 
     /**
