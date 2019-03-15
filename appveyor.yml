@@ -1,6 +1,7 @@
 branches:
   only:
     - master
+    - develop
 environment:
   tag_name: "%APPVEYOR_REPO_TAG_NAME%"
   release_name: "humm-magento-1.x_v%appveyor_repo_tag_name%.zip"
