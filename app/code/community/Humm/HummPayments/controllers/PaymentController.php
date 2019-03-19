@@ -1,5 +1,6 @@
 <?php
 require_once dirname( __FILE__ ) . '/../Helper/Crypto.php';
+require_once dirname( __FILE__ ) . '/../Helper/Data.php';
 
 class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Action {
     const LOG_FILE = 'humm.log';
@@ -351,11 +352,28 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         $specificCurrency = null;
         $order            = $this->getLastRealOrder();
         $total            = $order->getTotalDue();
+        $title            = Humm_HummPayments_Helper_Data::getTitle();
 
         if ( $this->getSpecificCountry() == self::HUMM_AU_COUNTRY_CODE ) {
+            if ( $title == 'Oxipay' && $total > 2100 ) {
+                Mage::getSingleton( 'checkout/session' )->addError( "Oxipay doesn't support purchases over $2100." );
+
+                return false;
+            }
             $specificCurrency = self::HUMM_AU_CURRENCY_CODE;
-        } else if ( $this->getSpecificCountry() == self::HUMM_NZ_COUNTRY_CODE ) {
+        } elseif ( $this->getSpecificCountry() == self::HUMM_NZ_COUNTRY_CODE ) {
+            if ( $title == 'Oxipay' && $total > 1500 ) {
+                Mage::getSingleton( 'checkout/session' )->addError( "Oxipay doesn't support purchases over $1500." );
+
+                return false;
+            }
             $specificCurrency = self::HUMM_NZ_CURRENCY_CODE;
+        }
+
+        if ( $title == 'Oxipay' && $total < 20 ) {
+            Mage::getSingleton( 'checkout/session' )->addError( "Oxipay doesn't support purchases less than $20." );
+
+            return false;
         }
 
         if ( $order->getBillingAddress()->getCountry() != $this->getSpecificCountry() || $order->getOrderCurrencyCode() != $specificCurrency ) {
