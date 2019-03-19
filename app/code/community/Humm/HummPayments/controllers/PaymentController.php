@@ -3,10 +3,10 @@ require_once dirname( __FILE__ ) . '/../Helper/Crypto.php';
 
 class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Action {
     const LOG_FILE = 'humm.log';
-    const OXIPAY_AU_CURRENCY_CODE = 'AUD';
-    const OXIPAY_AU_COUNTRY_CODE = 'AU';
-    const OXIPAY_NZ_CURRENCY_CODE = 'NZD';
-    const OXIPAY_NZ_COUNTRY_CODE = 'NZ';
+    const HUMM_AU_CURRENCY_CODE = 'AUD';
+    const HUMM_AU_COUNTRY_CODE = 'AU';
+    const HUMM_NZ_CURRENCY_CODE = 'NZD';
+    const HUMM_NZ_COUNTRY_CODE = 'NZ';
 
     /**
      * GET: /HummPayments/payment/start
@@ -352,10 +352,10 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         $order            = $this->getLastRealOrder();
         $total            = $order->getTotalDue();
 
-        if ( $this->getSpecificCountry() == self::OXIPAY_AU_COUNTRY_CODE ) {
-            $specificCurrency = self::OXIPAY_AU_CURRENCY_CODE;
-        } else if ( $this->getSpecificCountry() == self::OXIPAY_NZ_COUNTRY_CODE ) {
-            $specificCurrency = self::OXIPAY_NZ_CURRENCY_CODE;
+        if ( $this->getSpecificCountry() == self::HUMM_AU_COUNTRY_CODE ) {
+            $specificCurrency = self::HUMM_AU_CURRENCY_CODE;
+        } else if ( $this->getSpecificCountry() == self::HUMM_NZ_COUNTRY_CODE ) {
+            $specificCurrency = self::HUMM_NZ_CURRENCY_CODE;
         }
 
         if ( $order->getBillingAddress()->getCountry() != $this->getSpecificCountry() || $order->getOrderCurrencyCode() != $specificCurrency ) {
