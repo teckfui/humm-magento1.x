@@ -29,7 +29,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                 Mage::logException( $ex );
                 Mage::log( 'An exception was encountered in HummPayments/paymentcontroller: ' . $ex->getMessage(), Zend_Log::ERR, self::LOG_FILE );
                 Mage::log( $ex->getTraceAsString(), Zend_Log::ERR, self::LOG_FILE );
-                $this->getCheckoutSession()->addError( $this->__( 'Unable to start Humm Checkout.' ) );
+                $this->getCheckoutSession()->addError( $this->__( 'Unable to start humm Checkout.' ) );
             }
         } else {
             $this->restoreCart( $this->getLastRealOrder() );
@@ -97,7 +97,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         }
 
         if ( ! $orderId ) {
-            Mage::log( "Humm returned a null order id. This may indicate an issue with the Humm payment gateway.", Zend_Log::ERR, self::LOG_FILE );
+            Mage::log( "Humm returned a null order id. This may indicate an issue with the humm payment gateway.", Zend_Log::ERR, self::LOG_FILE );
             $this->_redirect( 'checkout/onepage/error', array( '_secure' => false ) );
 
             return;
@@ -377,13 +377,13 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         }
 
         if ( $order->getBillingAddress()->getCountry() != $this->getSpecificCountry() || $order->getOrderCurrencyCode() != $specificCurrency ) {
-            Mage::getSingleton( 'checkout/session' )->addError( "Orders from this country are not supported by Humm. Please select a different payment option." );
+            Mage::getSingleton( 'checkout/session' )->addError( "Orders from this country are not supported by humm. Please select a different payment option." );
 
             return false;
         }
 
         if ( ! $order->isVirtual && $order->getShippingAddress()->getCountry() != $this->getSpecificCountry() ) {
-            Mage::getSingleton( 'checkout/session' )->addError( "Orders shipped to this country are not supported by Humm. Please select a different payment option." );
+            Mage::getSingleton( 'checkout/session' )->addError( "Orders shipped to this country are not supported by humm. Please select a different payment option." );
 
             return false;
         }
@@ -468,7 +468,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
     }
 
     /**
-     * Method is called when an order is cancelled by a customer. As an Humm reference is only passed back to
+     * Method is called when an order is cancelled by a customer. As a humm reference is only passed back to
      * Magento upon a success or decline outcome, the method will return a message with a Magento reference only.
      *
      * @param Mage_Sales_Model_Order $order

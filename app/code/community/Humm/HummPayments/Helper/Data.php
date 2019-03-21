@@ -10,7 +10,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
     }
 
     /**
-     * get if this is Humm or Oxipay now
+     * get if this is humm or Oxipay now
      * @return string
      */
     public static function getTitle() {
