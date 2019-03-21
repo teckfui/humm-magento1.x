@@ -35,7 +35,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
             $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
             $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
             $domainsTest    = array(
-                'Humm'   => 'test3-cart.shophumm',
+                'Humm'   => 'integration-cart.shophumm',
                 'Oxipay' => 'securesandbox.oxipay'
             );
             $domains        = array(
@@ -57,7 +57,7 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
         $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
         $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
         $domainsTest    = array(
-            'Humm'   => 'test3-cart.shophumm',
+            'Humm'   => 'integration-cart.shophumm',
             'Oxipay' => 'portalssandbox.oxipay'
         );
         $domains        = array(
