@@ -31,7 +31,7 @@ class Humm_HummPayments_Model_Paymentmethod extends Mage_Payment_Model_Method_Ab
         $merchant_number = Mage::getStoreConfig( 'payment/HummPayments/merchant_number' );
         $apiKey          = Mage::getStoreConfig( 'payment/HummPayments/api_key' );
 
-        if ( empty( $payment->getData( 'creditmemo' ) ) ) {
+        if ( ! $payment->getData( 'creditmemo' ) ) {
             return;
         }
         $refund_amount  = $amount;
