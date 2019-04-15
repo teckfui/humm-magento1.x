@@ -57,15 +57,15 @@ class Humm_HummPayments_Helper_Data extends Mage_Core_Helper_Abstract {
         $country_domain = $country == 'NZ' ? '.co.nz' : '.com.au';  // .com.au is the default value
         $isSandbox      = Mage::getStoreConfig( 'payment/HummPayments/is_testing' ) ? true : false;
         $domainsTest    = array(
-            'Humm'   => 'integration-cart.shophumm',
+            'Humm'   => 'integration-buyerapi.shophumm',
             'Oxipay' => 'portalssandbox.oxipay'
         );
         $domains        = array(
-            'Humm'   => 'cart.shophumm',
+            'Humm'   => 'buyerapi.shophumm',
             'Oxipay' => 'portals.oxipay'
         );
 
-        return 'https://' . ( $isSandbox ? $domainsTest[ $title ] : $domains[ $title ] ) . $country_domain . '/api/ExternalRefund/processrefund';
+        return 'https://' . ( $isSandbox ? $domainsTest[ $title ] : $domains[ $title ] ) . $country_domain . '/api/ExternalRefund/v1/processrefund';
     }
 
     /**
