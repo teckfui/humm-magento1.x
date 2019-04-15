@@ -29,7 +29,6 @@ class Humm_HummPayments_Model_Observer {
         $orderCollection->setOrder( 'main_table.updated_at', Varien_Data_Collection::SORT_ORDER_ASC );
         $orderCollection->setPageSize( self::JOB_PROCESSING_LIMIT );
 
-        $orders = "";
         foreach ( $orderCollection->getItems() as $order ) {
             $orderModel = Mage::getModel( 'sales/order' );
             $orderModel->load( $order['entity_id'] );
