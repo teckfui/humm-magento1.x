@@ -20,6 +20,18 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                 $order   = $this->getLastRealOrder();
                 $payload = $this->getPayload( $order );
 
+                if ( in_array( $order->getState(), array(
+                    Mage_Sales_Model_Order::STATE_PROCESSING,
+                    Mage_Sales_Model_Order::STATE_COMPLETE,
+                    Mage_Sales_Model_Order::STATE_CLOSED,
+                    Mage_Sales_Model_Order::STATE_CANCELED,
+                    Mage_Sales_Model_Order::STATE_HOLDED,
+                    Mage_Sales_Model_Order::STATE_PAYMENT_REVIEW
+                ) ) ) {
+                    $this->_redirect( 'checkout/cart' );
+                    return;
+                }
+
                 $order->setState( Mage_Sales_Model_Order::STATE_PENDING_PAYMENT, true, 'Humm authorisation underway.' );
                 $order->setStatus( Humm_HummPayments_Helper_OrderStatus::STATUS_PENDING_PAYMENT );
                 $order->save();
