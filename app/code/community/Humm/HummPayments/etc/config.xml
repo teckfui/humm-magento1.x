@@ -107,6 +107,13 @@
                 </args>
             </HummPayments>
         </routers>
+        <layout>
+            <updates>
+                <Humm_HummPayments>
+                    <file>HummPayments/local.xml</file>
+                </Humm_HummPayments>
+            </updates>
+        </layout>
     </frontend>
     <!-- End Routing Configuration -->
 </config>

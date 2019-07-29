@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<layout version="0.1.0">
+    <default>
+        <reference name="before_body_end">
+            <block type="humm_payments/widget" name="humm.payments.widget" output="toHtml" template="HummPayments/widget.phtml"/>
+        </reference>
+    </default>
+</layout>

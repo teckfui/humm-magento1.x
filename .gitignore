@@ -22,6 +22,9 @@ app/design/frontend/base/default/*
 !app/design/frontend/base/default/template
 app/design/frontend/base/default/template/*
 !app/design/frontend/base/default/template/HummPayments
+!app/design/frontend/base/default/layout
+app/design/frontend/base/default/layout/*
+!app/design/frontend/base/default/layout/HummPayments
 !app/design/adminhtml/
 app/design/adminhtml/*
 !app/design/adminhtml/base
