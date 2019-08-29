@@ -116,6 +116,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         }
 
         $order = $this->getOrderById( $orderId );
+        $isFromAsyncCallback = ( strtoupper( $this->getRequest()->getMethod() == "POST" ) ) ? true : false;
 
         if ( ! $order ) {
             Mage::log( "Humm returned an id for an order that could not be retrieved: $orderId", Zend_Log::ERR, self::LOG_FILE );
@@ -167,11 +168,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             } else {
                 $write->commit();
 
-                if ( $result == "completed" ) {
-                    $this->_redirect( 'checkout/onepage/success', array( '_secure' => false ) );
-                } else {
-                    $this->_redirect( 'checkout/onepage/failure', array( '_secure' => false ) );
-                }
+                $this->sendResponse( $isFromAsyncCallback, $result, $orderId );
 
                 return;
             }
@@ -184,9 +181,6 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
 
             return;
         }
-
-        $order               = $this->getOrderById( $orderId );
-        $isFromAsyncCallback = ( strtoupper( $this->getRequest()->getMethod() == "POST" ) ) ? true : false;
 
         if ( $result == "completed" ) {
             if( $status = Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED ){
@@ -284,7 +278,6 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             } else {
                 $this->_redirect( 'checkout/onepage/failure', array( '_secure' => false ) );
             }
-
         }
 
         return;
@@ -314,7 +307,11 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
 
     /**
      * Constructs a request payload to send to humm
+     *
+     * @param $order
+     *
      * @return array
+     * @throws Mage_Core_Model_Store_Exception
      */
     private function getPayload( $order ) {
         if ( $order == null ) {
