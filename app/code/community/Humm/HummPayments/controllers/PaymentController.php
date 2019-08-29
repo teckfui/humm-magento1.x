@@ -141,8 +141,15 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                             ->from( array( 't' => $table ),
                                 array( 'state' ) )
                             ->where( 'increment_id = ?', $orderId );
-
             $state = $write->fetchOne( $select );
+
+            $select_status = $write->select()
+                            ->forUpdate()
+                            ->from( array( 't' => $table ),
+                                array( 'status' ) )
+                            ->where( 'increment_id = ?', $orderId );
+            $status = $write->fetchOne( $select_status );
+
             if ( $state === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT ) {
                 $whereQuery = array( 'increment_id = ?' => $orderId );
 
@@ -152,6 +159,10 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                     $dataQuery = array( 'state' => Mage_Sales_Model_Order::STATE_CANCELED );
                 }
 
+                $write->update( $table, $dataQuery, $whereQuery );
+            } elseif ( $status === Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED && $result == "completed" ){
+                $whereQuery = array( 'increment_id = ?' => $orderId );
+                $dataQuery = array( 'state' => Mage_Sales_Model_Order::STATE_PROCESSING );
                 $write->update( $table, $dataQuery, $whereQuery );
             } else {
                 $write->commit();
@@ -178,6 +189,26 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         $isFromAsyncCallback = ( strtoupper( $this->getRequest()->getMethod() == "POST" ) ) ? true : false;
 
         if ( $result == "completed" ) {
+            if( $status = Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED ){
+                $order->setBaseDiscountCanceled(0);
+                $order->setBaseShippingCanceled(0);
+                $order->setBaseSubtotalCanceled(0);
+                $order->setBaseTaxCanceled(0);
+                $order->setBaseTotalCanceled(0);
+                $order->setDiscountCanceled(0);
+                $order->setShippingCanceled(0);
+                $order->setSubtotalCanceled(0);
+                $order->setTaxCanceled(0);
+                $order->setTotalCanceled(0);
+
+                foreach ($order->getAllItems() as $item) {
+                    $item->setQtyCanceled(0);
+                    $item->setTaxCanceled(0);
+                    $item->setHiddenTaxCanceled(0);
+                    $item->save();
+                }
+            }
+
             $orderState    = Mage_Sales_Model_Order::STATE_PROCESSING;
             $orderStatus   = Mage::getStoreConfig( 'payment/HummPayments/humm_approved_order_status' );
             $emailCustomer = Mage::getStoreConfig( 'payment/HummPayments/email_customer' );
@@ -189,7 +220,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             $payment = $order->getPayment();
             $payment->setTransactionId( $transactionId );
 
-            $transaction = $payment->addTransaction( Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE );
+            $payment->addTransaction( Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE );
 
             $payment->save();
             $order->save();
