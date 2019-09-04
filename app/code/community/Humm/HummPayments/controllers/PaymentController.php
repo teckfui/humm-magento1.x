@@ -184,6 +184,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
 
         if ( $result == "completed" ) {
             if( $status = Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED ){
+                $order->setState(Mage_Sales_Model_Order::STATE_NEW, true, 'Order uncancelled by humm.', false );
                 $order->setBaseDiscountCanceled(0);
                 $order->setBaseShippingCanceled(0);
                 $order->setBaseSubtotalCanceled(0);
@@ -195,12 +196,42 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                 $order->setTaxCanceled(0);
                 $order->setTotalCanceled(0);
 
+                $stockItems = [];
+                $productIds = [];
+
                 foreach ($order->getAllItems() as $item) {
+                    /** @var $item Mage_Sales_Model_Order_Item */
                     $item->setQtyCanceled(0);
                     $item->setTaxCanceled(0);
                     $item->setHiddenTaxCanceled(0);
                     $item->save();
+
+                    $stockItems[$item->getProductId()] = ['qty'=>$item->getQtyOrdered()];
+                    $productIds[$item->getProductId()] = $item->getProductId();
+                    $children   = $item->getChildrenItems();
+                    if ($children) {
+                        foreach ($children as $childItem) {
+                            $productIds[$childItem->getProductId()] = $childItem->getProductId();
+                        }
+                    }
                 }
+
+                $stockModel = Mage::getSingleton('cataloginventory/stock');
+                $itemsForReindex = $stockModel->registerProductsSale($stockItems);
+
+                if (count($productIds)) {
+                    Mage::getResourceSingleton('cataloginventory/indexer_stock')->reindexProducts($productIds);
+                }
+
+                $stockProductIds = array();
+                foreach ($itemsForReindex as $item) {
+                    $item->save();
+                    $stockProductIds[] = $item->getProductId();
+                }
+                if (count($stockProductIds)) {
+                    Mage::getResourceSingleton('catalog/product_indexer_price')->reindexProductIds($stockProductIds);
+                }
+                $order->save();
             }
 
             $orderState    = Mage_Sales_Model_Order::STATE_PROCESSING;
