@@ -116,6 +116,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
         }
 
         $order = $this->getOrderById( $orderId );
+        $isFromAsyncCallback = ( strtoupper( $this->getRequest()->getMethod() == "POST" ) ) ? true : false;
 
         if ( ! $order ) {
             Mage::log( "Humm returned an id for an order that could not be retrieved: $orderId", Zend_Log::ERR, self::LOG_FILE );
@@ -141,8 +142,15 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                             ->from( array( 't' => $table ),
                                 array( 'state' ) )
                             ->where( 'increment_id = ?', $orderId );
-
             $state = $write->fetchOne( $select );
+
+            $select_status = $write->select()
+                            ->forUpdate()
+                            ->from( array( 't' => $table ),
+                                array( 'status' ) )
+                            ->where( 'increment_id = ?', $orderId );
+            $status = $write->fetchOne( $select_status );
+
             if ( $state === Mage_Sales_Model_Order::STATE_PENDING_PAYMENT ) {
                 $whereQuery = array( 'increment_id = ?' => $orderId );
 
@@ -153,14 +161,14 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
                 }
 
                 $write->update( $table, $dataQuery, $whereQuery );
+            } elseif ( $status === Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED && $result == "completed" ){
+                $whereQuery = array( 'increment_id = ?' => $orderId );
+                $dataQuery = array( 'state' => Mage_Sales_Model_Order::STATE_PROCESSING );
+                $write->update( $table, $dataQuery, $whereQuery );
             } else {
                 $write->commit();
 
-                if ( $result == "completed" ) {
-                    $this->_redirect( 'checkout/onepage/success', array( '_secure' => false ) );
-                } else {
-                    $this->_redirect( 'checkout/onepage/failure', array( '_secure' => false ) );
-                }
+                $this->sendResponse( $isFromAsyncCallback, $result, $orderId );
 
                 return;
             }
@@ -174,10 +182,58 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             return;
         }
 
-        $order               = $this->getOrderById( $orderId );
-        $isFromAsyncCallback = ( strtoupper( $this->getRequest()->getMethod() == "POST" ) ) ? true : false;
-
         if ( $result == "completed" ) {
+            if( $status = Humm_HummPayments_Helper_OrderStatus::STATUS_CANCELED ){
+                $order->setState(Mage_Sales_Model_Order::STATE_NEW, true, 'Order uncancelled by humm.', false );
+                $order->setBaseDiscountCanceled(0);
+                $order->setBaseShippingCanceled(0);
+                $order->setBaseSubtotalCanceled(0);
+                $order->setBaseTaxCanceled(0);
+                $order->setBaseTotalCanceled(0);
+                $order->setDiscountCanceled(0);
+                $order->setShippingCanceled(0);
+                $order->setSubtotalCanceled(0);
+                $order->setTaxCanceled(0);
+                $order->setTotalCanceled(0);
+
+                $stockItems = [];
+                $productIds = [];
+
+                foreach ($order->getAllItems() as $item) {
+                    /** @var $item Mage_Sales_Model_Order_Item */
+                    $item->setQtyCanceled(0);
+                    $item->setTaxCanceled(0);
+                    $item->setHiddenTaxCanceled(0);
+                    $item->save();
+
+                    $stockItems[$item->getProductId()] = ['qty'=>$item->getQtyOrdered()];
+                    $productIds[$item->getProductId()] = $item->getProductId();
+                    $children   = $item->getChildrenItems();
+                    if ($children) {
+                        foreach ($children as $childItem) {
+                            $productIds[$childItem->getProductId()] = $childItem->getProductId();
+                        }
+                    }
+                }
+
+                $stockModel = Mage::getSingleton('cataloginventory/stock');
+                $itemsForReindex = $stockModel->registerProductsSale($stockItems);
+
+                if (count($productIds)) {
+                    Mage::getResourceSingleton('cataloginventory/indexer_stock')->reindexProducts($productIds);
+                }
+
+                $stockProductIds = array();
+                foreach ($itemsForReindex as $item) {
+                    $item->save();
+                    $stockProductIds[] = $item->getProductId();
+                }
+                if (count($stockProductIds)) {
+                    Mage::getResourceSingleton('catalog/product_indexer_price')->reindexProductIds($stockProductIds);
+                }
+                $order->save();
+            }
+
             $orderState    = Mage_Sales_Model_Order::STATE_PROCESSING;
             $orderStatus   = Mage::getStoreConfig( 'payment/HummPayments/humm_approved_order_status' );
             $emailCustomer = Mage::getStoreConfig( 'payment/HummPayments/email_customer' );
@@ -189,7 +245,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             $payment = $order->getPayment();
             $payment->setTransactionId( $transactionId );
 
-            $transaction = $payment->addTransaction( Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE );
+            $payment->addTransaction( Mage_Sales_Model_Order_Payment_Transaction::TYPE_CAPTURE );
 
             $payment->save();
             $order->save();
@@ -253,7 +309,6 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             } else {
                 $this->_redirect( 'checkout/onepage/failure', array( '_secure' => false ) );
             }
-
         }
 
         return;
@@ -283,7 +338,11 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
 
     /**
      * Constructs a request payload to send to humm
+     *
+     * @param $order
+     *
      * @return array
+     * @throws Mage_Core_Model_Store_Exception
      */
     private function getPayload( $order ) {
         if ( $order == null ) {
@@ -347,7 +406,7 @@ class Humm_HummPayments_PaymentController extends Mage_Core_Controller_Front_Act
             'x_customer_shipping_state'    => str_replace( PHP_EOL, ' ', $shippingAddress_region ),
             'x_customer_shipping_zip'      => str_replace( PHP_EOL, ' ', $shippingAddress_postcode ),
             'x_test'                       => 'false',
-            'version_info'                 => 'Humm_' . (string) Mage::getConfig()->getNode()->modules->Humm_HummPayments->version . '_on_magento' . substr( Mage::getVersion(), 0, 3 )
+            'version_info'                 => 'Humm_' . (string) Mage::getConfig()->getNode()->modules->Humm_HummPayments->version . '_on_magento' . substr( Mage::getVersion(), 0, 4 )
         );
         $apiKey                 = $this->getApiKey();
         $signature              = Humm_HummPayments_Helper_Crypto::generateSignature( $data, $apiKey );
