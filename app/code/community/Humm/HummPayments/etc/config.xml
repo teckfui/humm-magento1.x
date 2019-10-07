@@ -4,7 +4,7 @@
     <!-- Module Metadata -->
     <modules>
         <Humm_HummPayments>
-            <version>humm_plugin_version_placeholder</version>
+            <version>1.5.11</version>
         </Humm_HummPayments>
     </modules>
     <!-- End Module Metadata -->
@@ -103,7 +103,7 @@
                 <use>standard</use>
                 <args>
                     <module>Humm_HummPayments</module>
-                    <frontName>HummPayments</frontName>
+                    <frontName>hummpayments</frontName>
                 </args>
             </HummPayments>
         </routers>
